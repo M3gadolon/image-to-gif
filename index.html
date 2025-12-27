@@ -2,33 +2,37 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Image → GIF</title>
-  <link rel="stylesheet" href="./style.css">
+  <title>Image to GIF</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="main">
   <div class="container">
-    <h1>画像 → GIF</h1>
+    <h1>Image to GIF</h1>
 
-    <div id="dropzone">
-      画像をドラッグ＆ドロップ<br>
-      またはクリックして選択
+    <input type="file" id="imageInput" accept="image/png, image/jpeg">
+
+    <div class="controls">
+      <label>
+        フレーム数
+        <input type="number" id="frameCount" value="10" min="1">
+      </label>
+
+      <label>
+        速度(ms)
+        <input type="number" id="delay" value="100" min="10">
+      </label>
     </div>
 
-    <input type="file" id="fileInput" accept="image/*" hidden>
+    <button id="convertBtn">GIFに変換</button>
 
-    <div id="status"></div>
-    <div id="preview"></div>
-    <button id="downloadBtn" style="display:none;">GIFをダウンロード</button>
+    <div class="preview">
+      <img id="gifPreview">
+    </div>
+
+    <a id="downloadLink" download="output.gif">GIFをダウンロード</a>
   </div>
-</div>
 
-<!-- ffmpeg.wasm v0.9.7 -->
-<script src="./ffmpeg/ffmpeg.min.js?v=2"></script>
-<script src="./script.js"></script>
-
-<link rel="icon" href="data:,">
+  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
