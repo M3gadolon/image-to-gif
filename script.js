@@ -32,9 +32,10 @@ function handleFile(file) {
   dropzone.hidden = true;
   previewArea.hidden = false;
 
-  // 状態リセット
+  // ★ ここが重要
+  convertBtn.hidden = false;   // 画像選択後に表示
+  downloadBtn.hidden = true;   // まだ変換してないので隠す
   gifData = null;
-  downloadBtn.hidden = true;
 }
 
 /* Convert */
