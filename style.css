@@ -61,6 +61,7 @@ body {
   padding: 36px 20px;
   cursor: pointer;
   transition: all .25s ease;
+  margin-bottom: 32px;
 }
 
 #dropzone:hover {
@@ -94,6 +95,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  margin-top: 32px;
 }
 
 #preview {
