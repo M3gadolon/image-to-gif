@@ -1,84 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image to GIF</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f8f8f8;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+h1 {
+  margin-top: 30px;
+}
+#dropzone {
+  margin: 30px auto;
+  max-width: 420px;
+  padding: 40px;
+  border: 3px dashed #aaa;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+#dropzone.hover {
+  border-color: #555;
+}
+#status {
+  margin-top: 15px;
+}
+#preview img {
+  max-width: 100%;
+  margin-top: 20px;
+}
+button {
+  margin: 20px;
+  padding: 10px 20px;
+  font-size: 1em;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Image → GIF</h1>
+
+<label id="dropzone">
+  画像をドラッグ＆ドロップ<br>
+  またはクリックして選択
+  <input type="file" id="fileInput" multiple accept="image/*" hidden>
+</label>
+
+<div id="status"></div>
+<div id="preview"></div>
+<button id="downloadBtn" style="display:none;">ダウンロード</button>
+
+<!-- ここから JS（bodyの一番下が重要） -->
 <script type="module">
 import { FFmpeg } from "https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js";
 import { fetchFile } from "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
 
-const dropzone = document.getElementById('dropzone');
-const fileInput = document.getElementById('fileInput');
-const statusEl = document.getElementById('status');
-const previewEl = document.getElementById('preview');
-const downloadBtn = document.getElementById('downloadBtn');
+document.addEventListener('DOMContentLoaded', () => {
 
-const ffmpeg = new FFmpeg();
-let gifURL = null;
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const statusEl = document.getElementById('status');
+  const previewEl = document.getElementById('preview');
+  const downloadBtn = document.getElementById('downloadBtn');
 
-async function loadFFmpeg() {
-  if (!ffmpeg.loaded) {
-    statusEl.textContent = 'FFmpegを読み込み中…';
-    await ffmpeg.load({
-      coreURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js"
-    });
-  }
-}
-
-fileInput.addEventListener('change', () => {
-  handleFiles(fileInput.files);
-});
-
-dropzone.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropzone.classList.add('hover');
-});
-dropzone.addEventListener('dragleave', () => {
-  dropzone.classList.remove('hover');
-});
-dropzone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropzone.classList.remove('hover');
-  handleFiles(e.dataTransfer.files);
-});
-
-async function handleFiles(files) {
-  if (!files || files.length === 0) return;
-
-  await loadFFmpeg();
-  statusEl.textContent = 'GIFを生成中…';
-
-  // 既存データ初期化
-  previewEl.innerHTML = '';
-  gifURL && URL.revokeObjectURL(gifURL);
-
-  // 画像を書き込み
-  for (let i = 0; i < files.length; i++) {
-    const name = `img${i}.png`;
-    await ffmpeg.writeFile(name, await fetchFile(files[i]));
+  if (!dropzone || !fileInput) {
+    console.error('DOMが見つかりません');
+    return;
   }
 
-  // GIF生成
-  await ffmpeg.exec([
-    '-framerate', '5',
-    '-i', 'img%d.png',
-    '-vf', 'scale=400:-1',
-    'output.gif'
-  ]);
+  const ffmpeg = new FFmpeg();
+  let gifURL = null;
 
-  const gifData = await ffmpeg.readFile('output.gif');
-  const blob = new Blob([gifData.buffer], { type: 'image/gif' });
-  gifURL = URL.createObjectURL(blob);
+  async function loadFFmpeg() {
+    if (!ffmpeg.loaded) {
+      statusEl.textContent = 'FFmpeg 読み込み中…';
+      await ffmpeg.load({
+        coreURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js"
+      });
+    }
+  }
 
-  // プレビュー表示
-  const img = document.createElement('img');
-  img.src = gifURL;
-  img.style.maxWidth = '100%';
-  previewEl.appendChild(img);
+  // クリックでファイル選択
+  dropzone.addEventListener('click', () => fileInput.click());
 
-  statusEl.textContent = '変換完了';
-  downloadBtn.style.display = 'inline-block';
+  // ドラッグ＆ドロップ
+  dropzone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropzone.classList.add('hover');
+  });
 
-  downloadBtn.onclick = () => {
-    const a = document.createElement('a');
-    a.href = gifURL;
-    a.download = 'converted.gif';
-    a.click();
-  };
-}
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('hover');
+  });
+
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('hover');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  fileInput.addEventListener('change', () => {
+    handleFiles(fileInput.files);
+  });
+
+  async function handleFiles(files) {
+    if (!files || files.length === 0) return;
+
+    await loadFFmpeg();
+    statusEl.textContent = 'GIF生成中…';
+
+    previewEl.innerHTML = '';
+    if (gifURL) URL.revokeObjectURL(gifURL);
+
+    // 画像を書き込み
+    for (let i = 0; i < files.length; i++) {
+      await ffmpeg.writeFile(
+        `img${i}.png`,
+        await fetchFile(files[i])
+      );
+    }
+
+    // GIF生成
+    await ffmpeg.exec([
+      '-framerate', '5',
+      '-i', 'img%d.png',
+      'output.gif'
+    ]);
+
+    const data = await ffmpeg.readFile('output.gif');
+    const blob = new Blob([data.buffer], { type: 'image/gif' });
+    gifURL = URL.createObjectURL(blob);
+
+    const img = document.createElement('img');
+    img.src = gifURL;
+    previewEl.appendChild(img);
+
+    statusEl.textContent = '完了';
+    downloadBtn.style.display = 'inline-block';
+
+    downloadBtn.onclick = () => {
+      const a = document.createElement('a');
+      a.href = gifURL;
+      a.download = 'converted.gif';
+      a.click();
+    };
+  }
+
+});
 </script>
+
+</body>
+</html>
