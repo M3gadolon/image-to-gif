@@ -1,5 +1,5 @@
 const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true });
+const ffmpeg = createFFmpeg({ log: true }); // corePath 指定しない！
 
 document.addEventListener('DOMContentLoaded', () => {
   const dropzone = document.getElementById('dropzone');
@@ -25,9 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     handleFile(e.dataTransfer.files[0]);
   };
 
-  fileInput.onchange = () => {
-    handleFile(fileInput.files[0]);
-  };
+  fileInput.onchange = () => handleFile(fileInput.files[0]);
 
   async function handleFile(file) {
     if (!file) return;
@@ -35,32 +33,27 @@ document.addEventListener('DOMContentLoaded', () => {
     statusEl.textContent = 'ffmpeg 読み込み中…';
 
     if (!ffmpeg.isLoaded()) {
-      await ffmpeg.load();
+      await ffmpeg.load(); // ← ここで core.js 等は読まれない
     }
 
     statusEl.textContent = 'GIF 変換中…';
 
     ffmpeg.FS('writeFile', 'input.png', await fetchFile(file));
-
-    await ffmpeg.run(
-      '-i', 'input.png',
-      '-vf', 'scale=iw:ih',
-      'output.gif'
-    );
+    await ffmpeg.run('-i', 'input.png', 'output.gif');
 
     const data = ffmpeg.FS('readFile', 'output.gif');
-    const gifBlob = new Blob([data.buffer], { type: 'image/gif' });
-    const gifURL = URL.createObjectURL(gifBlob);
+    const blob = new Blob([data.buffer], { type: 'image/gif' });
+    const url = URL.createObjectURL(blob);
 
     previewEl.innerHTML = '';
     const img = document.createElement('img');
-    img.src = gifURL;
+    img.src = url;
     previewEl.appendChild(img);
 
     downloadBtn.style.display = 'inline-block';
     downloadBtn.onclick = () => {
       const a = document.createElement('a');
-      a.href = gifURL;
+      a.href = url;
       a.download = file.name.replace(/\.\w+$/, '') + '_gifconvert.gif';
       a.click();
     };
