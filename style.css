@@ -1,31 +1,67 @@
 body {
-  background: #111;
-  color: #fff;
-  font-family: sans-serif;
+  margin: 0;
+  padding: 40px 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f6f7f9;
+  color: #333;
 }
 
-.container {
-  max-width: 400px;
-  margin: 50px auto;
+.card {
+  width: 520px;
+  margin: auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.header {
+  background: #3f62dd;
+  color: #fff;
+  padding: 30px 20px;
   text-align: center;
 }
 
-input, button {
-  margin: 15px 0;
+.header h1 {
+  margin: 0 0 10px;
 }
 
-button {
-  padding: 8px 16px;
-  cursor: pointer;
-}
-
-.preview img {
-  max-width: 100%;
-  margin-top: 20px;
-}
-
-a {
+.dropzone {
   display: block;
-  margin-top: 15px;
-  color: #4fc3f7;
+  padding: 30px;
+}
+
+.drop-inner {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.drop-inner:hover {
+  background: #f0f3ff;
+}
+
+.icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.text strong {
+  font-size: 16px;
+}
+
+.text span {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #777;
+}
+
+footer {
+  text-align: center;
+  margin-top: 20px;
+  color: #aaa;
 }
