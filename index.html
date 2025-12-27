@@ -2,39 +2,23 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image → GIF</title>
-
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="main">
-  <div class="container">
-
-    <h1>画像 → GIF</h1>
-
-    <div id="dropzone">
-      画像をドラッグ＆ドロップ<br>
-      またはクリックして選択
-    </div>
-
-    <input type="file" id="fileInput" accept="image/*" hidden>
-
-    <div id="status"></div>
-    <div id="preview"></div>
-
-    <button id="downloadBtn" style="display:none;">
-      GIFをダウンロード
-    </button>
-
-  </div>
+<div id="dropzone">
+  画像をドラッグ＆ドロップ<br>
+  またはクリックして選択
 </div>
 
-<!-- GIFEncoder（単体ファイル） -->
-<script src="./gif-encoder.js"></script>
-<script src="./script.js"></script>
+<input type="file" id="fileInput" accept="image/*" hidden>
+<div id="status"></div>
+<div id="preview"></div>
+<button id="downloadBtn" style="display:none;">GIFをダウンロード</button>
 
-<link rel="icon" href="data:,">
+<!-- ffmpeg 本体（JSラッパー） -->
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
