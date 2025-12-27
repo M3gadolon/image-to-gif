@@ -1,7 +1,7 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+
   const { createFFmpeg, fetchFile } = FFmpeg;
 
-  // SharedArrayBuffer を使わない旧 core を指定
   const ffmpeg = createFFmpeg({
     log: false,
     corePath: "https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js"
@@ -15,42 +15,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let gifURL = null;
 
-  dropzone.onclick = () => fileInput.click();
+  dropzone.addEventListener('click', () => fileInput.click());
 
-  dropzone.ondragover = e => {
+  dropzone.addEventListener('dragover', e => {
     e.preventDefault();
     dropzone.classList.add('drag');
-  };
+  });
 
-  dropzone.ondragleave = () => dropzone.classList.remove('drag');
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('drag');
+  });
 
-  dropzone.ondrop = e => {
+  dropzone.addEventListener('drop', e => {
     e.preventDefault();
     dropzone.classList.remove('drag');
     handleFile(e.dataTransfer.files[0]);
-  };
+  });
 
-  fileInput.onchange = () => handleFile(fileInput.files[0]);
+  fileInput.addEventListener('change', () => {
+    handleFile(fileInput.files[0]);
+  });
 
   async function handleFile(file) {
-    if(!file) return;
+    if (!file) return;
 
     statusEl.textContent = '読み込み中…';
     previewEl.innerHTML = '';
     downloadBtn.style.display = 'none';
 
-    if(!ffmpeg.isLoaded()) {
+    if (!ffmpeg.isLoaded()) {
       await ffmpeg.load();
     }
 
     statusEl.textContent = 'GIF変換中…';
 
-    // 単一画像処理
     ffmpeg.FS('writeFile', 'input.png', await fetchFile(file));
-    await ffmpeg.run('-i','input.png','output.gif');
+    await ffmpeg.run('-i', 'input.png', 'output.gif');
 
-    const data = ffmpeg.FS('readFile','output.gif');
-    const blob = new Blob([data.buffer], {type:'image/gif'});
+    const data = ffmpeg.FS('readFile', 'output.gif');
+    const blob = new Blob([data.buffer], { type: 'image/gif' });
     gifURL = URL.createObjectURL(blob);
 
     const img = document.createElement('img');
