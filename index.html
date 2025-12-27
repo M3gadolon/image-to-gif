@@ -1,54 +1,41 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>GIF化ツール</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- gifshot -->
-  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="container">
-    <div class="card">
-
-      <!-- ===== Header ===== -->
-      <div class="card-header">
-        <h1>GIF化ツール</h1>
-        <p>静止画を見た目が変わらないGIFに変換します</p>
-      </div>
-
-      <!-- ===== Dropzone ===== -->
-      <label id="dropzone">
-        <input
-          id="fileInput"
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          hidden
-        />
-        <p>ドラッグ＆ドロップ</p>
-        <p>またはクリックして画像を選択</p>
-        <small>対応: JPG / PNG / WebP</small>
-      </label>
-
-      <!-- ===== Preview ===== -->
-      <div id="previewArea" hidden>
-        <img id="preview" alt="preview" />
-      </div>
-
-      <!-- ===== Download ===== -->
-      <button id="downloadBtn" hidden>ダウンロード</button>
+  <div class="card">
+    <div class="title-area">
+      <h1>GIF化ツール</h1>
+      <p class="desc">静止画を見た目が変わらないGIFに変換します</p>
     </div>
 
-    <!-- ===== Footer ===== -->
-    <div class="footer">made by ああああ</div>
+    <label id="dropzone">
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+      <div class="dz-inner">
+        <div class="icon">↑</div>
+        <div class="text">
+          ドラッグ＆ドロップ<br>
+          またはクリックして画像を選択
+        </div>
+        <div class="note">JPG / PNG / WebP</div>
+      </div>
+    </label>
+
+    <div id="previewArea" hidden>
+      <img id="preview">
+      <button id="convertBtn">Convert</button>
+      <button id="downloadBtn" hidden>ダウンロード</button>
+    </div>
   </div>
 
-  <!-- JS -->
+  <footer>made by ああああ</footer>
+  <div id="toast">保存しました</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
