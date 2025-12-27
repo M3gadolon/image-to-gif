@@ -1,84 +1,68 @@
-console.log("script.js loaded");
-
-console.log("before import");
-
-import { FFmpeg } from "https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js";
-
-console.log("after import");
-
-import { fetchFile } from "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
-
 const dropArea = document.getElementById("dropArea");
 const fileInput = document.getElementById("fileInput");
 const status = document.getElementById("status");
-const resultImg = document.getElementById("result");
+const result = document.getElementById("result");
 
-/* =========================
-   ブラウザの標準D&D無効化
-========================= */
-document.addEventListener("dragover", e => e.preventDefault());
-document.addEventListener("drop", e => e.preventDefault());
+// 初期表示
+status.textContent = "画像を選択してください";
 
-/* =========================
-   クリック → ファイル選択
-========================= */
+// クリックでファイル選択
 dropArea.addEventListener("click", () => {
   fileInput.click();
 });
 
-/* =========================
-   ドラッグ＆ドロップ
-========================= */
-dropArea.addEventListener("drop", e => {
+// ファイル選択
+fileInput.addEventListener("change", (e) => {
+  if (e.target.files.length > 0) {
+    handleFile(e.target.files[0]);
+  }
+});
+
+// D&D 対策
+dropArea.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropArea.style.borderColor = "#333";
+});
+
+dropArea.addEventListener("dragleave", () => {
+  dropArea.style.borderColor = "#bbb";
+});
+
+dropArea.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropArea.style.borderColor = "#bbb";
+
   const file = e.dataTransfer.files[0];
   if (file) handleFile(file);
 });
 
-/* =========================
-   ファイル選択
-========================= */
-fileInput.addEventListener("change", e => {
-  const file = e.target.files[0];
-  if (file) handleFile(file);
-});
+function handleFile(file) {
+  if (!file.type.startsWith("image/")) {
+    status.textContent = "画像ファイルを選んでください";
+    return;
+  }
 
-/* =========================
-   FFmpeg 初期化
-========================= */
-const ffmpeg = new FFmpeg();
-
-async function initFFmpeg() {
-  status.textContent = "FFmpeg 読み込み中…";
-
-  await ffmpeg.load({
-    coreURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.js",
-    wasmURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.wasm"
-  });
-
-  status.textContent = "準備完了";
-}
-
-initFFmpeg();
-
-/* =========================
-   画像 → GIF 変換処理
-========================= */
-async function handleFile(file) {
   status.textContent = "変換中…";
-  resultImg.src = "";
 
-  await ffmpeg.writeFile("input.png", await fetchFile(file));
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
 
-  await ffmpeg.exec([
-    "-i", "input.png",
-    "-vf", "fps=10,scale=320:-1:flags=lanczos",
-    "output.gif"
-  ]);
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
 
-  const data = await ffmpeg.readFile("output.gif");
-  const blob = new Blob([data.buffer], { type: "image/gif" });
-  const url = URL.createObjectURL(blob);
+    // GIFとして出力
+    canvas.toBlob(
+      (blob) => {
+        const url = URL.createObjectURL(blob);
+        result.src = url;
+        status.textContent = "完了！右クリックで保存できます";
+      },
+      "image/gif"
+    );
+  };
 
-  resultImg.src = url;
-  status.textContent = "変換完了";
+  img.src = URL.createObjectURL(file);
 }
