@@ -42,6 +42,7 @@ body {
 }
 
 #dropzone {
+  display: block;
   margin: 24px;
   padding: 32px;
   border: 2px dashed rgba(255,255,255,.3);
