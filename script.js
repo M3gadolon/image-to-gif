@@ -1,92 +1,77 @@
-const dropArea = document.getElementById("dropArea");
-const fileInput = document.getElementById("fileInput");
-const status = document.getElementById("status");
-const result = document.getElementById("result");
-const downloadBtn = document.getElementById("downloadBtn");
+document.addEventListener('DOMContentLoaded', () => {
+  const { createFFmpeg, fetchFile } = FFmpeg;
 
-let gifBlob = null;
-let originalName = ""; // ← 追加
+  const ffmpeg = createFFmpeg({
+    log: false,
+    corePath: "https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js"
+  });
 
-// クリックでファイル選択
-dropArea.addEventListener("click", () => {
-  fileInput.click();
-});
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const statusEl = document.getElementById('status');
+  const previewEl = document.getElementById('preview');
+  const downloadBtn = document.getElementById('downloadBtn');
 
-// ファイル選択
-fileInput.addEventListener("change", (e) => {
-  if (e.target.files.length > 0) {
-    handleFile(e.target.files[0]);
-  }
-});
+  let gifURL = null;
 
-// ドラッグ中
-dropArea.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  dropArea.style.borderColor = "#333";
-});
+  dropzone.onclick = () => fileInput.click();
 
-// 離脱
-dropArea.addEventListener("dragleave", () => {
-  dropArea.style.borderColor = "#bbb";
-});
-
-// ドロップ
-dropArea.addEventListener("drop", (e) => {
-  e.preventDefault();
-  dropArea.style.borderColor = "#bbb";
-
-  const file = e.dataTransfer.files[0];
-  if (file) handleFile(file);
-});
-
-// メイン処理
-function handleFile(file) {
-  originalName = file.name.replace(/\.[^/.]+$/, ""); // 拡張子除去
-
-  if (!file.type.startsWith("image/")) {
-    status.textContent = "画像ファイルを選んでください";
-    return;
-  }
-
-  status.textContent = "変換中…";
-  downloadBtn.style.display = "none";
-  result.src = "";
-  gifBlob = null;
-
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-
-    canvas.toBlob(
-      (blob) => {
-        gifBlob = blob;
-        const url = URL.createObjectURL(blob);
-        result.src = url;
-
-        status.textContent = "完了！GIFとしてダウンロードできます";
-        downloadBtn.style.display = "inline-block";
-      },
-      "image/gif"
-    );
+  dropzone.ondragover = e => {
+    e.preventDefault();
+    dropzone.classList.add('drag');
   };
 
-  img.src = URL.createObjectURL(file);
-}
+  dropzone.ondragleave = () => {
+    dropzone.classList.remove('drag');
+  };
 
-// ダウンロード
-downloadBtn.addEventListener("click", () => {
-  if (!gifBlob) return;
+  dropzone.ondrop = e => {
+    e.preventDefault();
+    dropzone.classList.remove('drag');
+    handleFile(e.dataTransfer.files[0]);
+  };
 
-  const filename = `${originalName}_gifconvert.gif`;
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(gifBlob);
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  fileInput.onchange = () => {
+    handleFile(fileInput.files[0]);
+  };
+
+  async function handleFile(file) {
+    if (!file) return;
+
+    statusEl.textContent = '読み込み中…';
+    previewEl.innerHTML = '';
+    downloadBtn.style.display = 'none';
+
+    if (!ffmpeg.isLoaded()) {
+      await ffmpeg.load();
+    }
+
+    statusEl.textContent = 'GIF変換中…';
+
+    ffmpeg.FS('writeFile', 'input.png', await fetchFile(file));
+
+    await ffmpeg.run(
+      '-i', 'input.png',
+      '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      'output.gif'
+    );
+
+    const data = ffmpeg.FS('readFile', 'output.gif');
+    const blob = new Blob([data.buffer], { type: 'image/gif' });
+    gifURL = URL.createObjectURL(blob);
+
+    const img = document.createElement('img');
+    img.src = gifURL;
+    previewEl.appendChild(img);
+
+    statusEl.textContent = '変換完了';
+    downloadBtn.style.display = 'inline-block';
+
+    downloadBtn.onclick = () => {
+      const a = document.createElement('a');
+      a.href = gifURL;
+      a.download = 'image.gif';
+      a.click();
+    };
+  }
 });
