@@ -1,6 +1,4 @@
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -22,6 +20,8 @@ body {
   padding: 0 16px;
 }
 
+h1 { margin-bottom: 24px; }
+
 #dropzone {
   background: #fff;
   border: 3px dashed #bbb;
@@ -30,13 +30,9 @@ body {
   cursor: pointer;
 }
 
-#dropzone.drag {
-  border-color: #333;
-}
+#dropzone.drag { border-color: #333; }
 
-#status {
-  margin-top: 16px;
-}
+#status { margin-top: 16px; }
 
 #preview img {
   width: 100%;
