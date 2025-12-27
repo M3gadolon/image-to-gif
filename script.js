@@ -1,4 +1,11 @@
+console.log("script.js loaded");
+
+console.log("before import");
+
 import { FFmpeg } from "https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js";
+
+console.log("after import");
+
 import { fetchFile } from "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
 
 const dropArea = document.getElementById("dropArea");
