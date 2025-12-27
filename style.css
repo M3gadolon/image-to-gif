@@ -1,158 +1,57 @@
-/* ===== Reset & Base ===== */
 * {
   box-sizing: border-box;
 }
 
-html,
 body {
   margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-  background: radial-gradient(
-    circle at top,
-    #1b1f26 0%,
-    #0e1014 60%
-  );
-  color: #e6e6e6;
-}
-
-/* ===== Layout ===== */
-body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #1b1f26, #0e1014);
   display: flex;
   justify-content: center;
   align-items: center;
+  font-family: sans-serif;
+  color: #fff;
 }
 
 .container {
   width: 420px;
-  max-width: calc(100% - 32px);
 }
 
-/* ===== Card ===== */
 .card {
   background: #121417;
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  padding-bottom: 32px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  overflow: hidden;
 }
 
-/* ===== Card Header (Title Area) ===== */
 .card-header {
   background: linear-gradient(135deg, #1e3c88, #0b2a6f);
   padding: 32px 24px;
-  border-radius: 20px 20px 12px 12px;
   text-align: center;
 }
 
 .card-header h1 {
   margin: 0;
   font-size: 22px;
-  font-weight: 700;
-  color: #ffffff;
 }
 
 .card-header p {
   margin-top: 8px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
+  opacity: .85;
 }
 
-/* ===== Dropzone ===== */
 #dropzone {
-  margin: 32px 24px 0;
-  padding: 36px 24px;
-  border: 2px dashed rgba(255, 255, 255, 0.25);
-  border-radius: 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-#dropzone:hover {
-  border-color: #3b82f6;
-  background: rgba(59, 130, 246, 0.08);
-}
-
-#dropzone p {
-  margin: 6px 0;
-  font-size: 14px;
-}
-
-#dropzone small {
-  display: block;
-  margin-top: 8px;
-  font-size: 12px;
-  color: #9aa0aa;
-}
-
-/* ===== Preview Area ===== */
-#previewArea {
-  margin: 32px 24px 0;
-  padding: 24px;
-  background: #1a1d23;
+  margin: 24px;
+  padding: 32px;
+  border: 2px dashed rgba(255,255,255,.3);
   border-radius: 16px;
   text-align: center;
 }
 
-#preview {
-  max-width: 100%;
-  max-height: 240px;
-  border-radius: 12px;
-}
-
-/* ===== Download Button ===== */
-#downloadBtn {
-  display: block;
-  width: calc(100% - 48px);
-  margin: 24px auto 0;
-  padding: 14px 0;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #ffffff;
-  border: none;
-  border-radius: 9999px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-#downloadBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
-}
-
-#downloadBtn:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-/* ===== Footer ===== */
 .footer {
   margin-top: 16px;
   text-align: center;
   font-size: 12px;
-  color: #8b9098;
-}
-
-/* ===== Toast ===== */
-#toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: rgba(30, 32, 38, 0.95);
-  color: #ffffff;
-  padding: 10px 18px;
-  border-radius: 9999px;
-  font-size: 13px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-#toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  opacity: .6;
 }
