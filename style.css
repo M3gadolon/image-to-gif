@@ -2,8 +2,8 @@
   box-sizing: border-box;
 }
 
-html {
-  min-height: 100%;
+html, body {
+  height: 100%;
 }
 
 body {
@@ -14,17 +14,16 @@ body {
   align-items: center;
   justify-content: center;
 
-  background:
-    radial-gradient(1200px 400px at top, #1f2933, #0b0f14);
+  background: radial-gradient(1200px 500px at top, #1f2933, #0b0f14);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   color: #e5e7eb;
 }
 
-/* メインカード */
+/* Card */
 .card {
   width: 100%;
   max-width: 480px;
-  padding: 32px;
+  padding: 28px;
   background: #111827;
   border-radius: 20px;
   box-shadow:
@@ -33,18 +32,25 @@ body {
   text-align: center;
 }
 
-/* タイトル */
-h1 {
+/* Title area */
+.title-area {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  padding: 24px 20px;
+  border-radius: 14px;
+  margin-bottom: 28px;
+}
+
+.title-area h1 {
   margin: 0;
   font-size: 22px;
   font-weight: 700;
+  color: #fff;
 }
 
-/* 説明文 */
-.desc {
-  margin: 10px 0 28px;
+.title-area .desc {
+  margin-top: 8px;
   font-size: 14px;
-  color: #9ca3af;
+  color: #dbeafe;
 }
 
 /* Dropzone */
@@ -98,7 +104,6 @@ h1 {
 
 /* Button */
 button {
-  appearance: none;
   border: none;
   border-radius: 999px;
   padding: 14px 28px;
@@ -115,18 +120,19 @@ button:hover {
   box-shadow: 0 10px 24px rgba(79,110,247,.45);
 }
 
-/* フッター */
+/* Footer */
 footer {
   margin-top: 24px;
   font-size: 12px;
   color: #6b7280;
 }
 
+/* Toast */
 #toast {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background: rgba(17, 24, 39, 0.95);
+  background: rgba(17,24,39,.95);
   color: #fff;
   padding: 12px 18px;
   border-radius: 999px;
