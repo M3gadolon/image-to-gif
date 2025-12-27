@@ -5,6 +5,7 @@ const preview = document.getElementById("preview");
 const downloadBtn = document.getElementById("downloadBtn");
 
 let sourceURL = null;
+let baseFileName = "image"; // デフォルト
 
 dropzone.addEventListener("dragover", e => {
   e.preventDefault();
@@ -22,7 +23,9 @@ input.addEventListener("change", () => {
 function handleFile(file) {
   if (!file) return;
 
-  // 即プレビュー（←これが超重要）
+  // 拡張子を除いたファイル名を取得
+  baseFileName = file.name.replace(/\.[^/.]+$/, "");
+
   sourceURL = URL.createObjectURL(file);
   preview.src = sourceURL;
 
@@ -34,19 +37,16 @@ downloadBtn.addEventListener("click", () => {
   if (!sourceURL) return;
 
   gifshot.createGIF(
-    {
-      images: [sourceURL],
-      interval: 1
-    },
+    { images: [sourceURL], interval: 1 },
     result => {
       if (result.error) {
-        alert("GIF変換に失敗しました（WebPは非対応の場合があります）");
+        alert("GIF変換に失敗しました");
         return;
       }
 
       const a = document.createElement("a");
       a.href = result.image;
-      a.download = "converted.gif";
+      a.download = `${baseFileName}_gifconvert.gif`;
       a.click();
     }
   );
