@@ -2,9 +2,9 @@ const dropArea = document.getElementById("dropArea");
 const fileInput = document.getElementById("fileInput");
 const status = document.getElementById("status");
 const result = document.getElementById("result");
+const downloadBtn = document.getElementById("downloadBtn");
 
-// 初期表示
-status.textContent = "画像を選択してください";
+let gifBlob = null;
 
 // クリックでファイル選択
 dropArea.addEventListener("click", () => {
@@ -18,16 +18,18 @@ fileInput.addEventListener("change", (e) => {
   }
 });
 
-// D&D 対策
+// ドラッグ中
 dropArea.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropArea.style.borderColor = "#333";
 });
 
+// 離脱
 dropArea.addEventListener("dragleave", () => {
   dropArea.style.borderColor = "#bbb";
 });
 
+// ドロップ
 dropArea.addEventListener("drop", (e) => {
   e.preventDefault();
   dropArea.style.borderColor = "#bbb";
@@ -36,6 +38,7 @@ dropArea.addEventListener("drop", (e) => {
   if (file) handleFile(file);
 });
 
+// メイン処理
 function handleFile(file) {
   if (!file.type.startsWith("image/")) {
     status.textContent = "画像ファイルを選んでください";
@@ -43,6 +46,9 @@ function handleFile(file) {
   }
 
   status.textContent = "変換中…";
+  downloadBtn.style.display = "none";
+  result.src = "";
+  gifBlob = null;
 
   const img = new Image();
   img.onload = () => {
@@ -53,35 +59,30 @@ function handleFile(file) {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
 
-  const downloadBtn = document.getElementById("downloadBtn");
+    canvas.toBlob(
+      (blob) => {
+        gifBlob = blob;
+        const url = URL.createObjectURL(blob);
+        result.src = url;
 
-  let gifBlob = null;
-  
-  // canvas.toBlob 部分を置き換え
-  canvas.toBlob(
-    (blob) => {
-      gifBlob = blob;
-  
-      const url = URL.createObjectURL(blob);
-      result.src = url;
-  
-      downloadBtn.style.display = "inline-block";
-      status.textContent = "完了！GIFとしてダウンロードできます";
-    },
-    "image/gif"
-  );
-  
-  // ダウンロード処理
-  downloadBtn.onclick = () => {
-    if (!gifBlob) return;
-  
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(gifBlob);
-    a.download = "converted.gif";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+        status.textContent = "完了！GIFとしてダウンロードできます";
+        downloadBtn.style.display = "inline-block";
+      },
+      "image/gif"
+    );
   };
-  
-    img.src = URL.createObjectURL(file);
-  }
+
+  img.src = URL.createObjectURL(file);
+}
+
+// ダウンロード
+downloadBtn.addEventListener("click", () => {
+  if (!gifBlob) return;
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(gifBlob);
+  a.download = "converted.gif";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
