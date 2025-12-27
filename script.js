@@ -2,7 +2,6 @@ const input = document.getElementById("fileInput");
 const dropzone = document.getElementById("dropzone");
 const previewArea = document.getElementById("previewArea");
 const preview = document.getElementById("preview");
-const convertBtn = document.getElementById("convertBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const toast = document.getElementById("toast");
 
@@ -22,55 +21,40 @@ input.addEventListener("change", () => {
   handleFile(input.files[0]);
 });
 
-/* ファイル選択時 */
+/* ファイル選択時 → 即変換 */
 function handleFile(file) {
   if (!file) return;
 
   baseFileName = file.name.replace(/\.[^/.]+$/, "");
   sourceURL = URL.createObjectURL(file);
 
+  // プレビュー
   preview.src = sourceURL;
 
-  // UI状態（ここで一度だけ定義）
+  // UI状態
   dropzone.hidden = true;
   previewArea.hidden = false;
-
-  convertBtn.hidden = false;
-  convertBtn.disabled = false;
-  convertBtn.textContent = "Convert";
-
   downloadBtn.hidden = true;
   gifData = null;
-}
 
-/* Convert */
-convertBtn.addEventListener("click", () => {
-  if (!sourceURL) return;
-
-  convertBtn.disabled = true;
-  convertBtn.textContent = "変換中…";
-
+  // 自動GIF変換
   gifshot.createGIF(
     {
       images: [sourceURL],
       interval: 1,
-      background: "rgba(0,0,0,0)"
+      background: "rgba(0,0,0,0)" // 透過保持
     },
     result => {
-      convertBtn.disabled = false;
-      convertBtn.textContent = "Convert";
-
       if (result.error) {
         alert("GIF変換に失敗しました");
         return;
       }
 
-      // ★ ここで初めてDownloadを表示
       gifData = result.image;
       downloadBtn.hidden = false;
     }
   );
-});
+}
 
 /* Download */
 downloadBtn.addEventListener("click", () => {
