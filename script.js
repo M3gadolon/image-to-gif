@@ -1,5 +1,5 @@
 const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true }); // corePath 指定しない！
+const ffmpeg = createFFmpeg({ log: true }); // corePath は指定しない
 
 document.addEventListener('DOMContentLoaded', () => {
   const dropzone = document.getElementById('dropzone');
@@ -15,9 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dropzone.classList.add('drag');
   };
 
-  dropzone.ondragleave = () => {
-    dropzone.classList.remove('drag');
-  };
+  dropzone.ondragleave = () => dropzone.classList.remove('drag');
 
   dropzone.ondrop = e => {
     e.preventDefault();
@@ -29,11 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function handleFile(file) {
     if (!file) return;
-
     statusEl.textContent = 'ffmpeg 読み込み中…';
 
     if (!ffmpeg.isLoaded()) {
-      await ffmpeg.load(); // ← ここで core.js 等は読まれない
+      await ffmpeg.load();
     }
 
     statusEl.textContent = 'GIF 変換中…';
