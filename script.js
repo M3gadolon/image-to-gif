@@ -79,9 +79,11 @@ function handleFile(file) {
 downloadBtn.addEventListener("click", () => {
   if (!gifBlob) return;
 
+  const filename = `${originalName}_gifconvert.gif`;
+
   const a = document.createElement("a");
   a.href = URL.createObjectURL(gifBlob);
-  a.download = "converted.gif";
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
