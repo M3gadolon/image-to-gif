@@ -1,5 +1,10 @@
 const input = document.getElementById("fileInput");
-const dropzone = document.querySelector(".dropzone");
+const dropzone = document.getElementById("dropzone");
+const previewArea = document.getElementById("previewArea");
+const preview = document.getElementById("preview");
+const downloadBtn = document.getElementById("downloadBtn");
+
+let gifData = null;
 
 dropzone.addEventListener("dragover", e => {
   e.preventDefault();
@@ -20,17 +25,22 @@ function handleFile(file) {
   const url = URL.createObjectURL(file);
 
   gifshot.createGIF(
-    {
-      images: [url],
-      interval: 1
-    },
+    { images: [url], interval: 1 },
     result => {
       if (result.error) return;
 
-      const a = document.createElement("a");
-      a.href = result.image;
-      a.download = "converted.gif";
-      a.click();
+      gifData = result.image;
+      preview.src = gifData;
+
+      dropzone.hidden = true;
+      previewArea.hidden = false;
     }
   );
 }
+
+downloadBtn.addEventListener("click", () => {
+  const a = document.createElement("a");
+  a.href = gifData;
+  a.download = "converted.gif";
+  a.click();
+});
