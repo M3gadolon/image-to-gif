@@ -2,14 +2,17 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image to GIF</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Image → GIF</title>
+
+  <!-- CSS パスは必ず正確に -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
 <div class="main">
   <div class="container">
+
     <h1>画像 → GIF</h1>
 
     <div id="dropzone">
@@ -21,14 +24,15 @@
 
     <div id="status"></div>
     <div id="preview"></div>
-
     <button id="downloadBtn" style="display:none;">GIFをダウンロード</button>
+
   </div>
 </div>
 
+<!-- ffmpeg 旧版 core を安全に指定 -->
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
-<script src="script.js"></script>
-<link rel="icon" href="data:,">
+<script src="./script.js"></script>
 
+<link rel="icon" href="data:,">
 </body>
 </html>
