@@ -7,31 +7,31 @@
 </head>
 <body>
 
-<div class="card">
-  <h1>GIF化ツール</h1>
-  <p class="desc">静止画を見た目が変わらないGIFに変換します</p>
+  <div class="card">
+    <h1>GIF化ツール</h1>
+    <p class="desc">静止画を見た目が変わらないGIFに変換します</p>
 
-  <label id="dropzone">
-    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
-    <div class="dz-inner">
-      <div class="icon">⬆︎</div>
-      <div class="text">
-        ドラッグ＆ドロップ<br>
-        またはクリックして画像を選択
+    <label id="dropzone">
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+      <div class="dz-inner">
+        <div class="icon">↑</div>
+        <div class="text">
+          ドラッグ＆ドロップ<br>
+          またはクリックして画像を選択
+        </div>
+        <div class="note">JPG / PNG / WebP</div>
       </div>
-      <div class="note">JPG / PNG / WebP</div>
+    </label>
+
+    <div id="previewArea" hidden>
+      <img id="preview">
+      <button id="downloadBtn">ダウンロード</button>
     </div>
-  </label>
-
-  <div id="previewArea" hidden>
-    <img id="preview">
-    <button id="downloadBtn">ダウンロード</button>
   </div>
-</div>
 
-<footer>made by ああああ</footer>
+  <footer>made by ああああ</footer>
 
-<script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
-<script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
