@@ -53,16 +53,35 @@ function handleFile(file) {
     const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
 
-    // GIFとして出力
-    canvas.toBlob(
-      (blob) => {
-        const url = URL.createObjectURL(blob);
-        result.src = url;
-        status.textContent = "完了！右クリックで保存できます";
-      },
-      "image/gif"
-    );
-  };
+  const downloadBtn = document.getElementById("downloadBtn");
 
-  img.src = URL.createObjectURL(file);
-}
+  let gifBlob = null;
+  
+  // canvas.toBlob 部分を置き換え
+  canvas.toBlob(
+    (blob) => {
+      gifBlob = blob;
+  
+      const url = URL.createObjectURL(blob);
+      result.src = url;
+  
+      downloadBtn.style.display = "inline-block";
+      status.textContent = "完了！GIFとしてダウンロードできます";
+    },
+    "image/gif"
+  );
+  
+  // ダウンロード処理
+  downloadBtn.onclick = () => {
+    if (!gifBlob) return;
+  
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(gifBlob);
+    a.download = "converted.gif";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+  
+    img.src = URL.createObjectURL(file);
+  }
