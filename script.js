@@ -6,14 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewEl = document.getElementById('preview');
   const downloadBtn = document.getElementById('downloadBtn');
 
-  let outputURL = null;
+  let gifURL = null;
+  let originalName = 'image';
 
-  // クリックでファイル選択
-  dropzone.addEventListener('click', () => {
-    fileInput.click();
-  });
+  dropzone.addEventListener('click', () => fileInput.click());
 
-  // ドラッグ中
   dropzone.addEventListener('dragover', e => {
     e.preventDefault();
     dropzone.classList.add('drag');
@@ -23,34 +20,30 @@ document.addEventListener('DOMContentLoaded', () => {
     dropzone.classList.remove('drag');
   });
 
-  // ドロップ
   dropzone.addEventListener('drop', e => {
     e.preventDefault();
     dropzone.classList.remove('drag');
     handleFile(e.dataTransfer.files[0]);
   });
 
-  // ファイル選択
   fileInput.addEventListener('change', () => {
     handleFile(fileInput.files[0]);
   });
 
   async function handleFile(file) {
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      alert('画像ファイルを選択してください');
-      return;
-    }
+    if (!file || !file.type.startsWith('image/')) return;
 
-    statusEl.textContent = '変換中…';
+    originalName = file.name.replace(/\.[^.]+$/, '');
+
+    statusEl.textContent = 'GIF変換中…';
     previewEl.innerHTML = '';
     downloadBtn.style.display = 'none';
 
     try {
-      outputURL = await imageToWebP(file);
+      gifURL = await imageToGif(file);
 
       const img = document.createElement('img');
-      img.src = outputURL;
+      img.src = gifURL;
       previewEl.appendChild(img);
 
       statusEl.textContent = '変換完了';
@@ -58,20 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       downloadBtn.onclick = () => {
         const a = document.createElement('a');
-        a.href = outputURL;
-        a.download = 'image.webp';
+        a.href = gifURL;
+        a.download = `${originalName}_gifconvert.gif`;
         a.click();
       };
 
-    } catch (err) {
-      console.error(err);
+    } catch (e) {
+      console.error(e);
       statusEl.textContent = '変換失敗';
     }
   }
 });
 
-/* ===== Image → WebP（完全ブラウザ対応） ===== */
-async function imageToWebP(file) {
+/* ===== Image → GIF（ffmpegなし） ===== */
+async function imageToGif(file) {
   const img = new Image();
   img.src = URL.createObjectURL(file);
   await img.decode();
@@ -79,13 +72,20 @@ async function imageToWebP(file) {
   const canvas = document.createElement('canvas');
   canvas.width = img.width;
   canvas.height = img.height;
-
   const ctx = canvas.getContext('2d');
   ctx.drawImage(img, 0, 0);
 
-  return new Promise(resolve => {
-    canvas.toBlob(blob => {
-      resolve(URL.createObjectURL(blob));
-    }, 'image/webp', 0.95);
-  });
+  const encoder = new GIFEncoder(img.width, img.height);
+  encoder.setRepeat(0);
+  encoder.setDelay(100);
+  encoder.setQuality(10);
+  encoder.start();
+
+  encoder.addFrame(ctx);
+  encoder.finish();
+
+  const buffer = encoder.out.getData();
+  const blob = new Blob([buffer], { type: 'image/gif' });
+
+  return URL.createObjectURL(blob);
 }
