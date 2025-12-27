@@ -1,32 +1,36 @@
-const imageInput = document.getElementById("imageInput");
-const convertBtn = document.getElementById("convertBtn");
-const gifPreview = document.getElementById("gifPreview");
-const downloadLink = document.getElementById("downloadLink");
+const input = document.getElementById("fileInput");
+const dropzone = document.querySelector(".dropzone");
 
-let imageURL = null;
-
-imageInput.addEventListener("change", e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  imageURL = URL.createObjectURL(file);
+dropzone.addEventListener("dragover", e => {
+  e.preventDefault();
 });
 
-convertBtn.addEventListener("click", () => {
-  if (!imageURL) {
-    alert("画像を選択してください");
-    return;
-  }
+dropzone.addEventListener("drop", e => {
+  e.preventDefault();
+  handleFile(e.dataTransfer.files[0]);
+});
+
+input.addEventListener("change", () => {
+  handleFile(input.files[0]);
+});
+
+function handleFile(file) {
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
 
   gifshot.createGIF(
     {
-      images: [imageURL], // 1枚だけ
-      interval: 1          // 実質静止画GIF
+      images: [url],
+      interval: 1
     },
     result => {
-      if (!result.error) {
-        gifPreview.src = result.image;
-        downloadLink.href = result.image;
-      }
+      if (result.error) return;
+
+      const a = document.createElement("a");
+      a.href = result.image;
+      a.download = "converted.gif";
+      a.click();
     }
   );
-});
+}
