@@ -13,32 +13,39 @@ body {
   margin: 0;
   padding: 0;
 }
+
 h1 {
   margin-top: 30px;
 }
+
 #dropzone {
   margin: 30px auto;
   max-width: 420px;
   padding: 40px;
   border: 3px dashed #aaa;
-  border-radius: 8px;
   background: #fff;
   cursor: pointer;
+  border-radius: 8px;
 }
+
 #dropzone.hover {
   border-color: #555;
 }
+
 #status {
   margin-top: 15px;
 }
+
 #preview img {
   max-width: 100%;
   margin-top: 20px;
 }
+
 button {
-  margin: 20px;
+  margin-top: 20px;
   padding: 10px 20px;
-  font-size: 1em;
+  font-size: 16px;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -57,7 +64,7 @@ button {
 <div id="preview"></div>
 <button id="downloadBtn" style="display:none;">ダウンロード</button>
 
-<!-- ここから JS（bodyの一番下が重要） -->
+<!-- ================= JS ================= -->
 <script type="module">
 import { FFmpeg } from "https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js";
 import { fetchFile } from "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
@@ -71,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const downloadBtn = document.getElementById('downloadBtn');
 
   if (!dropzone || !fileInput) {
-    console.error('DOMが見つかりません');
+    console.error('DOMの取得に失敗しました');
     return;
   }
 
@@ -87,10 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // クリックでファイル選択
   dropzone.addEventListener('click', () => fileInput.click());
 
-  // ドラッグ＆ドロップ
   dropzone.addEventListener('dragover', e => {
     e.preventDefault();
     dropzone.classList.add('hover');
@@ -113,13 +118,19 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleFiles(files) {
     if (!files || files.length === 0) return;
 
-    await loadFFmpeg();
-    statusEl.textContent = 'GIF生成中…';
-
     previewEl.innerHTML = '';
-    if (gifURL) URL.revokeObjectURL(gifURL);
+    statusEl.textContent = '準備中…';
+    downloadBtn.style.display = 'none';
 
-    // 画像を書き込み
+    if (gifURL) {
+      URL.revokeObjectURL(gifURL);
+      gifURL = null;
+    }
+
+    await loadFFmpeg();
+
+    statusEl.textContent = 'GIF 生成中…';
+
     for (let i = 0; i < files.length; i++) {
       await ffmpeg.writeFile(
         `img${i}.png`,
@@ -127,10 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     }
 
-    // GIF生成
     await ffmpeg.exec([
       '-framerate', '5',
       '-i', 'img%d.png',
+      '-vf', 'scale=400:-1',
       'output.gif'
     ]);
 
@@ -155,6 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+
+<!-- favicon 404 対策 -->
+<link rel="icon" href="data:,">
 
 </body>
 </html>
