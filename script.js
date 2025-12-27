@@ -1,60 +1,36 @@
-const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true }); // corePath は指定しない
+const imageInput = document.getElementById("imageInput");
+const convertBtn = document.getElementById("convertBtn");
+const gifPreview = document.getElementById("gifPreview");
+const downloadLink = document.getElementById("downloadLink");
 
-document.addEventListener('DOMContentLoaded', () => {
-  const dropzone = document.getElementById('dropzone');
-  const fileInput = document.getElementById('fileInput');
-  const statusEl = document.getElementById('status');
-  const previewEl = document.getElementById('preview');
-  const downloadBtn = document.getElementById('downloadBtn');
+let imageURL = null;
 
-  dropzone.onclick = () => fileInput.click();
+imageInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  imageURL = URL.createObjectURL(file);
+});
 
-  dropzone.ondragover = e => {
-    e.preventDefault();
-    dropzone.classList.add('drag');
-  };
+convertBtn.addEventListener("click", () => {
+  if (!imageURL) return alert("画像を選択してください");
 
-  dropzone.ondragleave = () => dropzone.classList.remove('drag');
+  const frameCount = Number(document.getElementById("frameCount").value);
+  const delay = Number(document.getElementById("delay").value);
 
-  dropzone.ondrop = e => {
-    e.preventDefault();
-    dropzone.classList.remove('drag');
-    handleFile(e.dataTransfer.files[0]);
-  };
+  const images = Array(frameCount).fill(imageURL);
 
-  fileInput.onchange = () => handleFile(fileInput.files[0]);
-
-  async function handleFile(file) {
-    if (!file) return;
-    statusEl.textContent = 'ffmpeg 読み込み中…';
-
-    if (!ffmpeg.isLoaded()) {
-      await ffmpeg.load();
+  gifshot.createGIF(
+    {
+      images,
+      interval: delay / 1000,
+      gifWidth: 400,
+      gifHeight: 400
+    },
+    result => {
+      if (!result.error) {
+        gifPreview.src = result.image;
+        downloadLink.href = result.image;
+      }
     }
-
-    statusEl.textContent = 'GIF 変換中…';
-
-    ffmpeg.FS('writeFile', 'input.png', await fetchFile(file));
-    await ffmpeg.run('-i', 'input.png', 'output.gif');
-
-    const data = ffmpeg.FS('readFile', 'output.gif');
-    const blob = new Blob([data.buffer], { type: 'image/gif' });
-    const url = URL.createObjectURL(blob);
-
-    previewEl.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = url;
-    previewEl.appendChild(img);
-
-    downloadBtn.style.display = 'inline-block';
-    downloadBtn.onclick = () => {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name.replace(/\.\w+$/, '') + '_gifconvert.gif';
-      a.click();
-    };
-
-    statusEl.textContent = '変換完了';
-  }
+  );
 });
