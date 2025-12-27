@@ -2,17 +2,18 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image → GIF</title>
 
   <link rel="stylesheet" href="./style.css">
+  <link rel="icon" href="data:,">
 </head>
 <body>
 
 <div class="main">
   <div class="container">
 
-    <h1>画像 → GIF</h1>
+    <h1>画像 → GIF（WebP変換）</h1>
 
     <div id="dropzone">
       画像をドラッグ＆ドロップ<br>
@@ -23,15 +24,14 @@
 
     <div id="status"></div>
     <div id="preview"></div>
-    <button id="downloadBtn" style="display:none;">GIFをダウンロード</button>
+
+    <button id="downloadBtn" style="display:none;">
+      ダウンロード
+    </button>
 
   </div>
 </div>
 
-<!-- ffmpeg は完全に削除 -->
-<script src="https://unpkg.com/gif-encoder-2/browser.js"></script>
 <script src="./script.js"></script>
-
-<link rel="icon" href="data:,">
 </body>
 </html>
