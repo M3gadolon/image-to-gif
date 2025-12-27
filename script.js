@@ -5,6 +5,7 @@ const result = document.getElementById("result");
 const downloadBtn = document.getElementById("downloadBtn");
 
 let gifBlob = null;
+let originalName = ""; // ← 追加
 
 // クリックでファイル選択
 dropArea.addEventListener("click", () => {
@@ -40,7 +41,8 @@ dropArea.addEventListener("drop", (e) => {
 
 // メイン処理
 function handleFile(file) {
-  originalName = file.name.replace(/\.[^/.]+$/, "");
+  originalName = file.name.replace(/\.[^/.]+$/, ""); // 拡張子除去
+
   if (!file.type.startsWith("image/")) {
     status.textContent = "画像ファイルを選んでください";
     return;
@@ -79,6 +81,7 @@ function handleFile(file) {
 // ダウンロード
 downloadBtn.addEventListener("click", () => {
   if (!gifBlob) return;
+
   const filename = `${originalName}_gifconvert.gif`;
   const a = document.createElement("a");
   a.href = URL.createObjectURL(gifBlob);
