@@ -6,15 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewEl = document.getElementById('preview');
   const downloadBtn = document.getElementById('downloadBtn');
 
-  let gifURL = null;
-  let baseName = 'image';
+  let gifDataUrl = null;
 
-  // クリック
+  /* クリックで選択 */
   dropzone.addEventListener('click', () => {
     fileInput.click();
   });
 
-  // ドラッグ
+  /* ドラッグ */
   dropzone.addEventListener('dragover', e => {
     e.preventDefault();
     dropzone.classList.add('drag');
@@ -34,52 +33,70 @@ document.addEventListener('DOMContentLoaded', () => {
     handleFile(fileInput.files[0]);
   });
 
-  function handleFile(file) {
-    if (!file || !file.type.startsWith('image/')) {
+  async function handleFile(file) {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
       alert('画像ファイルを選択してください');
       return;
     }
 
-    baseName = file.name.replace(/\.[^.]+$/, '');
-
-    statusEl.textContent = 'GIF変換中…';
+    statusEl.textContent = 'GIF 変換中…';
     previewEl.innerHTML = '';
     downloadBtn.style.display = 'none';
 
-    const reader = new FileReader();
-    reader.onload = () => {
+    try {
+      gifDataUrl = await imageToGif(file);
 
-      // ★ gifshotのみ使用
-      gifshot.createGIF({
-        images: [reader.result],
-        numFrames: 1,
-        interval: 1
-      }, result => {
+      const img = document.createElement('img');
+      img.src = gifDataUrl;
+      previewEl.appendChild(img);
 
-        if (result.error) {
-          console.error(result.error);
-          statusEl.textContent = '変換失敗';
-          return;
-        }
+      statusEl.textContent = '変換完了';
+      downloadBtn.style.display = 'inline-block';
 
-        gifURL = result.image;
+      downloadBtn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = gifDataUrl;
+        a.download = file.name.replace(/\.[^/.]+$/, '') + '_gifconvert.gif';
+        a.click();
+      };
 
-        const img = document.createElement('img');
-        img.src = gifURL;
-        previewEl.appendChild(img);
-
-        statusEl.textContent = '変換完了';
-        downloadBtn.style.display = 'inline-block';
-
-        downloadBtn.onclick = () => {
-          const a = document.createElement('a');
-          a.href = gifURL;
-          a.download = `${baseName}_gifconvert.gif`;
-          a.click();
-        };
-      });
-    };
-
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = '変換失敗';
+    }
   }
 });
+
+/* =========================
+   GIF生成（静止画1枚）
+   ========================= */
+async function imageToGif(file) {
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+  await img.decode();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+
+  const ctx = canvas.getContext('2d', {
+    willReadFrequently: true
+  });
+
+  ctx.drawImage(img, 0, 0);
+
+  const encoder = new GIFEncoder();
+  encoder.setRepeat(0);   // ループ
+  encoder.setDelay(1000); // 表示時間
+  encoder.start();
+
+  encoder.addFrame(ctx);
+  encoder.finish();
+
+  const binary = encoder.stream().getData();
+  const base64 = btoa(binary);
+
+  return 'data:image/gif;base64,' + base64;
+}
