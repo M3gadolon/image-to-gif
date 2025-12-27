@@ -40,6 +40,7 @@ dropArea.addEventListener("drop", (e) => {
 
 // メイン処理
 function handleFile(file) {
+  originalName = file.name.replace(/\.[^/.]+$/, "");
   if (!file.type.startsWith("image/")) {
     status.textContent = "画像ファイルを選んでください";
     return;
@@ -78,10 +79,7 @@ function handleFile(file) {
 // ダウンロード
 downloadBtn.addEventListener("click", () => {
   if (!gifBlob) return;
-
-  originalName = file.name.replace(/\.[^/.]+$/, "");
   const filename = `${originalName}_gifconvert.gif`;
-
   const a = document.createElement("a");
   a.href = URL.createObjectURL(gifBlob);
   a.download = filename;
