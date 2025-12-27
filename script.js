@@ -9,8 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let gifURL = null;
   let baseName = 'image';
 
-  dropzone.addEventListener('click', () => fileInput.click());
+  // クリック
+  dropzone.addEventListener('click', () => {
+    fileInput.click();
+  });
 
+  // ドラッグ
   dropzone.addEventListener('dragover', e => {
     e.preventDefault();
     dropzone.classList.add('drag');
@@ -31,7 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function handleFile(file) {
-    if (!file || !file.type.startsWith('image/')) return;
+    if (!file || !file.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください');
+      return;
+    }
 
     baseName = file.name.replace(/\.[^.]+$/, '');
 
@@ -42,16 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const reader = new FileReader();
     reader.onload = () => {
 
-      // gifshot はグローバルに gifshot を生やす
+      // ★ gifshotのみ使用
       gifshot.createGIF({
         images: [reader.result],
         numFrames: 1,
-        interval: 1,
+        interval: 1
       }, result => {
 
         if (result.error) {
-          statusEl.textContent = '変換失敗';
           console.error(result.error);
+          statusEl.textContent = '変換失敗';
           return;
         }
 
