@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Image → GIF</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
 
-<div id="dropzone">
-  画像をドラッグ＆ドロップ<br>
-  またはクリックして選択
+<div class="main">
+  <div class="container">
+    <h1>画像 → GIF</h1>
+
+    <div id="dropzone">
+      画像をドラッグ＆ドロップ<br>
+      またはクリックして選択
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*" hidden>
+
+    <div id="status"></div>
+    <div id="preview"></div>
+    <button id="downloadBtn" style="display:none;">GIFをダウンロード</button>
+  </div>
 </div>
 
-<input type="file" id="fileInput" accept="image/*" hidden>
-<div id="status"></div>
-<div id="preview"></div>
-<button id="downloadBtn" style="display:none;">GIFをダウンロード</button>
+<!-- ffmpeg.wasm v0.9.7（ローカル） -->
+<script src="./ffmpeg/ffmpeg.min.js"></script>
+<script src="./script.js"></script>
 
-<!-- ffmpeg 本体（JSラッパー） -->
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
-<script src="script.js"></script>
+<link rel="icon" href="data:,">
 </body>
 </html>
