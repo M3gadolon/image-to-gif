@@ -8,8 +8,10 @@
 <body>
 
   <div class="card">
-    <h1>GIF化ツール</h1>
-    <p class="desc">静止画を見た目が変わらないGIFに変換します</p>
+    <div class="title-area">
+      <h1>GIF化ツール</h1>
+      <p class="desc">静止画を見た目が変わらないGIFに変換します</p>
+    </div>
 
     <label id="dropzone">
       <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
@@ -25,14 +27,15 @@
 
     <div id="previewArea" hidden>
       <img id="preview">
-      <button id="downloadBtn">ダウンロード</button>
+      <button id="downloadBtn">GIFをダウンロード</button>
     </div>
   </div>
 
   <footer>made by ああああ</footer>
 
+  <div id="toast">保存しました</div>
+
   <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
   <script src="script.js"></script>
-  <div id="toast">保存しました</div>
 </body>
 </html>
