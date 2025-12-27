@@ -22,6 +22,7 @@ input.addEventListener("change", () => {
   handleFile(input.files[0]);
 });
 
+/* ファイル選択時 */
 function handleFile(file) {
   if (!file) return;
 
@@ -29,12 +30,16 @@ function handleFile(file) {
   sourceURL = URL.createObjectURL(file);
 
   preview.src = sourceURL;
+
+  // UI状態（ここで一度だけ定義）
   dropzone.hidden = true;
   previewArea.hidden = false;
 
-  // ★ ここが重要
-  convertBtn.hidden = false;   // 画像選択後に表示
-  downloadBtn.hidden = true;   // まだ変換してないので隠す
+  convertBtn.hidden = false;
+  convertBtn.disabled = false;
+  convertBtn.textContent = "Convert";
+
+  downloadBtn.hidden = true;
   gifData = null;
 }
 
@@ -60,6 +65,7 @@ convertBtn.addEventListener("click", () => {
         return;
       }
 
+      // ★ ここで初めてDownloadを表示
       gifData = result.image;
       downloadBtn.hidden = false;
     }
