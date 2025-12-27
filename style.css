@@ -2,81 +2,98 @@
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  background: #f4f6f8;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #111;
+html {
+  min-height: 100%;
 }
 
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(1200px 400px at top, #1f2933, #0b0f14);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #e5e7eb;
+}
+
+/* メインカード */
 .card {
+  width: 100%;
   max-width: 480px;
-  margin: 60px auto;
   padding: 32px;
-  background: #fff;
+  background: #111827;
   border-radius: 20px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.08);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(255,255,255,.04);
   text-align: center;
 }
 
+/* タイトル */
 h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
+  font-weight: 700;
 }
 
+/* 説明文 */
 .desc {
-  margin: 8px 0 24px;
-  color: #666;
+  margin: 10px 0 28px;
   font-size: 14px;
+  color: #9ca3af;
 }
 
 /* Dropzone */
 #dropzone {
   display: block;
-  border: 2px dashed #d0d7de;
+  border: 2px dashed #374151;
   border-radius: 16px;
   padding: 36px 20px;
   cursor: pointer;
-  transition: all .2s ease;
+  transition: all .25s ease;
 }
 
 #dropzone:hover {
-  background: #f6f8ff;
   border-color: #4f6ef7;
+  background: rgba(79,110,247,.08);
 }
 
 .dz-inner {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   align-items: center;
+  gap: 12px;
 }
 
 .icon {
-  font-size: 28px;
+  font-size: 26px;
   color: #4f6ef7;
 }
 
 .text {
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .note {
   font-size: 12px;
-  color: #888;
+  color: #6b7280;
 }
 
 /* Preview */
 #previewArea {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 #preview {
   max-width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.1);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.6);
 }
 
 /* Button */
@@ -84,23 +101,23 @@ button {
   appearance: none;
   border: none;
   border-radius: 999px;
-  padding: 12px 24px;
+  padding: 14px 28px;
   font-size: 14px;
   font-weight: 600;
-  background: #4f6ef7;
+  background: linear-gradient(135deg, #4f6ef7, #3b82f6);
   color: #fff;
   cursor: pointer;
-  transition: transform .1s ease, box-shadow .1s ease;
+  transition: transform .15s ease, box-shadow .15s ease;
 }
 
 button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(79,110,247,.4);
+  box-shadow: 0 10px 24px rgba(79,110,247,.45);
 }
 
+/* フッター */
 footer {
   margin-top: 24px;
-  text-align: center;
   font-size: 12px;
-  color: #aaa;
+  color: #6b7280;
 }
