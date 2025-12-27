@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewEl = document.getElementById('preview');
   const downloadBtn = document.getElementById('downloadBtn');
 
-  let gifURL = null;
+  let outputURL = null;
 
   // クリックでファイル選択
   dropzone.addEventListener('click', () => {
@@ -42,15 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    statusEl.textContent = 'GIF 変換中…';
+    statusEl.textContent = '変換中…';
     previewEl.innerHTML = '';
     downloadBtn.style.display = 'none';
 
     try {
-      gifURL = await imageToGif(file);
+      outputURL = await imageToWebP(file);
 
       const img = document.createElement('img');
-      img.src = gifURL;
+      img.src = outputURL;
       previewEl.appendChild(img);
 
       statusEl.textContent = '変換完了';
@@ -58,8 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       downloadBtn.onclick = () => {
         const a = document.createElement('a');
-        a.href = gifURL;
-        a.download = 'image.gif';
+        a.href = outputURL;
+        a.download = 'image.webp';
         a.click();
       };
 
@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-/* ===== GIF生成（ffmpeg 不使用） ===== */
-async function imageToGif(file) {
+/* ===== Image → WebP（完全ブラウザ対応） ===== */
+async function imageToWebP(file) {
   const img = new Image();
   img.src = URL.createObjectURL(file);
   await img.decode();
@@ -79,23 +79,13 @@ async function imageToGif(file) {
   const canvas = document.createElement('canvas');
   canvas.width = img.width;
   canvas.height = img.height;
+
   const ctx = canvas.getContext('2d');
-
-  const encoder = new GIFEncoder(img.width, img.height);
-  encoder.setRepeat(0);
-  encoder.setDelay(100);
-  encoder.setQuality(10);
-  encoder.start();
-
   ctx.drawImage(img, 0, 0);
-  encoder.addFrame(ctx);
 
-  encoder.finish();
-
-  const blob = new Blob(
-    [encoder.out.getData()],
-    { type: 'image/gif' }
-  );
-
-  return URL.createObjectURL(blob);
+  return new Promise(resolve => {
+    canvas.toBlob(blob => {
+      resolve(URL.createObjectURL(blob));
+    }, 'image/webp', 0.95);
+  });
 }
