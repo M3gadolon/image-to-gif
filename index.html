@@ -1,26 +1,34 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Image to GIF</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>GIF化ツール</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Image to GIF</h1>
 
-    <input type="file" id="imageInput" accept="image/png, image/jpeg">
-
-    <button id="convertBtn">GIFに変換</button>
-
-    <div class="preview">
-      <img id="gifPreview">
-    </div>
-
-    <a id="downloadLink" download="output.gif">GIFをダウンロード</a>
+<div class="card">
+  <div class="header">
+    <h1>GIF化ツール</h1>
+    <p>静止画をアニメーション形式のGIF（見た目は変わらない）に変換します。</p>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
-  <script src="script.js"></script>
+  <label class="dropzone">
+    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden />
+    <div class="drop-inner">
+      <div class="icon">🖼️+</div>
+      <div class="text">
+        <strong>画像をドラッグ＆ドロップ</strong><br />
+        または クリックして選択<br />
+        <span>対応: JPG, PNG, WebP</span>
+      </div>
+    </div>
+  </label>
+</div>
+
+<footer>made by ああああ</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gifshot@0.3.2/build/gifshot.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
