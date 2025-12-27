@@ -1,90 +1,84 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>Image to GIF Converter</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./style.css">
+<script type="module">
+import { FFmpeg } from "https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js";
+import { fetchFile } from "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
 
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f4f4f4;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 24px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.1);
-      text-align: center;
-    }
-    h1 {
-      margin-top: 0;
-    }
-    .drop-area {
-      border: 2px dashed #bbb;
-      border-radius: 10px;
-      padding: 40px 20px;
-      cursor: pointer;
-      transition: .2s;
-    }
-    .drop-area:hover {
-      background: #fafafa;
-      border-color: #555;
-    }
-    input[type="file"] {
-      display: none;
-    }
-    #status {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #555;
-    }
-    img {
-      margin-top: 20px;
-      max-width: 100%;
-      border-radius: 8px;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: none;
-      background: #333;
-      color: #fff;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #555;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Image → GIF</h1>
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const statusEl = document.getElementById('status');
+const previewEl = document.getElementById('preview');
+const downloadBtn = document.getElementById('downloadBtn');
 
-    <div class="drop-area" id="dropArea">
-      クリック or 画像をドラッグ＆ドロップ
-    </div>
+const ffmpeg = new FFmpeg();
+let gifURL = null;
 
-    <input
-      type="file"
-      id="fileInput"
-      accept="image/png,image/jpeg"
-    >
+async function loadFFmpeg() {
+  if (!ffmpeg.loaded) {
+    statusEl.textContent = 'FFmpegを読み込み中…';
+    await ffmpeg.load({
+      coreURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js"
+    });
+  }
+}
 
-    <div id="status">画像を選択してください</div>
+fileInput.addEventListener('change', () => {
+  handleFiles(fileInput.files);
+});
 
-    <img id="result" alt="">
+dropzone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropzone.classList.add('hover');
+});
+dropzone.addEventListener('dragleave', () => {
+  dropzone.classList.remove('hover');
+});
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('hover');
+  handleFiles(e.dataTransfer.files);
+});
 
-    <button id="downloadBtn" style="display:none;">
-      GIFをダウンロード
-    </button>
-  </div>
+async function handleFiles(files) {
+  if (!files || files.length === 0) return;
 
-  <script type="module" src="./script.js"></script>
-</body>
-</html>
+  await loadFFmpeg();
+  statusEl.textContent = 'GIFを生成中…';
+
+  // 既存データ初期化
+  previewEl.innerHTML = '';
+  gifURL && URL.revokeObjectURL(gifURL);
+
+  // 画像を書き込み
+  for (let i = 0; i < files.length; i++) {
+    const name = `img${i}.png`;
+    await ffmpeg.writeFile(name, await fetchFile(files[i]));
+  }
+
+  // GIF生成
+  await ffmpeg.exec([
+    '-framerate', '5',
+    '-i', 'img%d.png',
+    '-vf', 'scale=400:-1',
+    'output.gif'
+  ]);
+
+  const gifData = await ffmpeg.readFile('output.gif');
+  const blob = new Blob([gifData.buffer], { type: 'image/gif' });
+  gifURL = URL.createObjectURL(blob);
+
+  // プレビュー表示
+  const img = document.createElement('img');
+  img.src = gifURL;
+  img.style.maxWidth = '100%';
+  previewEl.appendChild(img);
+
+  statusEl.textContent = '変換完了';
+  downloadBtn.style.display = 'inline-block';
+
+  downloadBtn.onclick = () => {
+    const a = document.createElement('a');
+    a.href = gifURL;
+    a.download = 'converted.gif';
+    a.click();
+  };
+}
+</script>
