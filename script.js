@@ -1,68 +1,77 @@
-window.addEventListener("DOMContentLoaded", () => {
+import { FFmpeg } from "https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js";
+import { fetchFile } from "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
 
-  if (typeof FFmpeg === "undefined") {
-    alert("FFmpegの読み込みに失敗しています");
-    return;
-  }
+const dropArea = document.getElementById("dropArea");
+const fileInput = document.getElementById("fileInput");
+const status = document.getElementById("status");
+const resultImg = document.getElementById("result");
 
-  const { createFFmpeg, fetchFile } = FFmpeg;
-  const ffmpeg = createFFmpeg({ log: false });
+/* =========================
+   ブラウザの標準D&D無効化
+========================= */
+document.addEventListener("dragover", e => e.preventDefault());
+document.addEventListener("drop", e => e.preventDefault());
 
-  const drop = document.getElementById("drop");
-  const result = document.getElementById("result");
-
-  /* ブラウザのD&D無効化 */
-  ["dragenter", "dragover", "dragleave", "drop"].forEach(event => {
-    document.addEventListener(event, e => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-  });
-
-  /* クリック */
-  drop.addEventListener("click", () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/png,image/jpeg";
-    input.onchange = () => convert(input.files[0]);
-    input.click();
-  });
-
-  /* ドラッグ */
-  drop.addEventListener("dragover", () => {
-    drop.classList.add("drag");
-  });
-
-  drop.addEventListener("dragleave", () => {
-    drop.classList.remove("drag");
-  });
-
-  drop.addEventListener("drop", e => {
-    drop.classList.remove("drag");
-    convert(e.dataTransfer.files[0]);
-  });
-
-  async function convert(file) {
-    if (!file) return;
-
-    drop.textContent = "変換中…";
-
-    if (!ffmpeg.isLoaded()) {
-      await ffmpeg.load();
-    }
-
-    ffmpeg.FS("writeFile", "input.png", await fetchFile(file));
-
-    await ffmpeg.run("-i", "input.png", "output.gif");
-
-    const data = ffmpeg.FS("readFile", "output.gif");
-    const url = URL.createObjectURL(
-      new Blob([data.buffer], { type: "image/gif" })
-    );
-
-    result.src = url;
-    result.style.display = "block";
-    drop.textContent = "画像をドラッグ＆ドロップ\nまたはクリック";
-  }
-
+/* =========================
+   クリック → ファイル選択
+========================= */
+dropArea.addEventListener("click", () => {
+  fileInput.click();
 });
+
+/* =========================
+   ドラッグ＆ドロップ
+========================= */
+dropArea.addEventListener("drop", e => {
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+/* =========================
+   ファイル選択
+========================= */
+fileInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (file) handleFile(file);
+});
+
+/* =========================
+   FFmpeg 初期化
+========================= */
+const ffmpeg = new FFmpeg();
+
+async function initFFmpeg() {
+  status.textContent = "FFmpeg 読み込み中…";
+
+  await ffmpeg.load({
+    coreURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.js",
+    wasmURL: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.wasm"
+  });
+
+  status.textContent = "準備完了";
+}
+
+initFFmpeg();
+
+/* =========================
+   画像 → GIF 変換処理
+========================= */
+async function handleFile(file) {
+  status.textContent = "変換中…";
+  resultImg.src = "";
+
+  await ffmpeg.writeFile("input.png", await fetchFile(file));
+
+  await ffmpeg.exec([
+    "-i", "input.png",
+    "-vf", "fps=10,scale=320:-1:flags=lanczos",
+    "output.gif"
+  ]);
+
+  const data = await ffmpeg.readFile("output.gif");
+  const blob = new Blob([data.buffer], { type: "image/gif" });
+  const url = URL.createObjectURL(blob);
+
+  resultImg.src = url;
+  status.textContent = "変換完了";
+}
